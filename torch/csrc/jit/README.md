@@ -982,7 +982,7 @@ with prim::FusionGroup_0 = graph(%13 : Float(*, *),
   return (%hy, %cy)
 ```
 
-
+# CHECK
 *Derivate Splitting* Many Graphs will require gradients (i.e. one of the inputs will have a `requires_grad`) property set. In this case, it is unsafe to run post-derivative optimizations directly on the Graph. Instead, our approach is to first *split* the Graph into sub-Graphs where symbolic gradient formulas are known and produce an explicit Graph for the forward pass along with a complementary Graph that implements the backwards pass using some of the values computed in the forward pass. We can then apply post-derivative optimization to the forward graph. The "gradOutputs" for the backwards graph are only known when the backward pass runs, so we cannot fully optimize it at this time. For instance, we do not know if some of those gradOutputs will also `require_grad` meaning that a gradient-of-gradient situation exists. Instead the backward pass will use a new GraphExecutor object to run and optimize its execution. In this way, we can handle an indefinite number of recursive gradient calculations.
 
 The creating of derivative subgraphs is done using a similar approach to finding fusion groups: adjacent operations with known gradient formulas are grouped together into `prim::DifferentiableGraph` nodes. We only generate these nodes if we can find a large enough subgraph where optimization is likely to be profitable since there is some overhead involved in entering and exiting a differentiable subgraph.
